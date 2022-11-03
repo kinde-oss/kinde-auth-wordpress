@@ -1,0 +1,17 @@
+{
+    "name": "kinde/auth-wordpress-plugin",
+    "version": "0.0.1",
+    "description": "The kinde auth wordpress plugin",
+    "keywords": [
+        "php",
+        "wordpress"
+    ],
+    "require": {
+        "kinde-oss/kinde-auth-php": "^0.0.1"
+    },
+    "autoload": {
+        "files": [
+            "helpers/helpers.php"
+        ]
+    }
+}
