@@ -27,13 +27,14 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 // Load plugin class files.
 require_once 'includes/kinde-auth-wordpress.php';
 
-// // Load plugin libraries.
+// Load plugin libraries.
 require_once 'includes/lib/kinde-auth-wordpress-menu-page.php';
 require_once 'includes/lib/kinde-auth-wordpress-template-admin.php';
 require_once 'includes/lib/kinde-auth-wordpress-setting-option.php';
 require_once 'includes/lib/kinde-auth-wordpress-short-code.php';
 require_once 'includes/lib/kinde-auth-wordpress-authenticate.php';
 require_once 'includes/lib/kinde-auth-wordpress-function.php';
+require_once 'includes/lib/kinde-auth-wordpress-export.php';
 
 /**
  * Returns the main instance of Kinde Auth Wordpress to prevent the need to use globals.

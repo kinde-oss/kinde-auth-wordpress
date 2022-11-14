@@ -132,6 +132,9 @@ class Kinde_Auth_Wordpress
 
 		// register kinde auth functions
 		$this->register_kinde_functions();
+
+		// register kinde auth export
+		$this->register_kinde_export();
 	}
 
 	/**
@@ -210,6 +213,17 @@ class Kinde_Auth_Wordpress
 	{
 		$kinde_function = new Kinde_Auth_Wordpress_Function();
 		return $kinde_function;
+	}
+
+	/**
+	 * Register a kinde authenticate functions
+	 *
+	 * @return Kinde_Auth_Wordpress_Export
+	 */
+	public function register_kinde_export()
+	{
+		$kinde_export = new Kinde_Auth_Wordpress_Export();
+		return $kinde_export;
 	}
 
 	/**

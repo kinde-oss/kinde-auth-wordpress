@@ -458,4 +458,5 @@ class Kinde_Auth_Wordpress_Authenticate
             'user_role' => $user_role
         ];
     }
+
 }
