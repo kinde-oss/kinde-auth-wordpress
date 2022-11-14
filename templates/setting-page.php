@@ -110,6 +110,20 @@
         </p>
         <?php submit_button(); ?>
     </form>
+    <div class="kinde-export-users">
+        <h2 class="sub-title">Export wordpress users</h2>
+        <?php
+            if (!empty($_GET['error_export'])) {
+        ?>
+            <p class="export-error">
+                <strong><?php echo urldecode($_GET['error_export']) ?? 'Something went wrong!!!'?></strong>
+            </p>
+        <?php
+            }
+        ?>
+        <a href="/kinde-authenticate/export-wp-users" class="button button-primary">Exports Data</a>
+        <p class="sub-title"><strong>NOTE: </strong> You can export wordpress users and import to the kinde authorization server</p>
+    </div>
     </div>
 <style>
     h1.postbox-header {
@@ -129,6 +143,21 @@
     }
     .text-required {
         color: #d63638;
+    }
+
+    .export-error {
+        color: #d63638;
+        font-size: 0.8rem;
+    }
+
+    .kinde-export-users {
+        padding-top: 10px;
+        border-top: 1px solid #c3c4c7
+    }
+
+    .kinde-export-users h2 {
+        font-size: 1.2rem;
+        font-weight: bold;
     }
 
     @media screen and (min-width: 786px){
