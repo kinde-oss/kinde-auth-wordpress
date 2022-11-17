@@ -59,10 +59,10 @@ class Kinde_Auth_Wordpress_Export
                     'first_name' => $first_name ?? '',
                     'last_name' => $last_name ?? '',
                     'email' => $user_data->user_email,
-                    'salt' => '',
+                    'salt' => substr($user_data->user_pass, 4, 8),
                     'salt_position' => 'prefix',
                     'hashed_password' => $user_data->user_pass,
-                    'hashing_method' => 'md5',
+                    'hashing_method' => 'brcypt',
                     'email_verified' => $user_data->user_status == "0" ? "true" : "false"
                 ];
 
