@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Kinde Auth
  * Version: 0.0.1
- * Plugin URI: https://kinde.com/
+ * Plugin URI: https://github.com/kinde-oss/kinde-auth-wordpress
  * Description: This is kinde auth plugin use for wordpress
  * Author: Kinde
  * Author URI: https://kinde.com/
