@@ -5,7 +5,6 @@
  * Plugin URI: https://kinde.com/
  * Description: This is kinde auth plugin use for wordpress
  * Author: Kinde
- * Author URI: https://kinde.com/
  *
  * Text Domain: kinde-auth
  *
