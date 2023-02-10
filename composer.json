@@ -7,7 +7,7 @@
         "wordpress"
     ],
     "require": {
-        "kinde-oss/kinde-auth-php": "^0.0.1"
+        "kinde-oss/kinde-auth-php": "^0.0.2"
     },
     "autoload": {
         "files": [

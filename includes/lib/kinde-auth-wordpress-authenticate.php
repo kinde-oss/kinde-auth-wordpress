@@ -5,18 +5,18 @@
  * @package Kind Auth Wordpress/Includes
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH')) {
     exit;
 }
 
-define( 'WP_KINDE_AUTH_AUTHENTICATE_DIR', plugin_dir_path( __FILE__ ) ); // Includes trailing slash
 
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use Kinde\KindeSDK\Api\UserApi;
+use Kinde\KindeSDK\Api\OAuthApi;
 use Kinde\KindeSDK\Configuration;
 use Kinde\KindeSDK\KindeClientSDK;
 use Kinde\KindeSDK\Sdk\Enums\GrantType;
+use Kinde\KindeSDK\Sdk\Enums\AuthStatus;
 
 /**
  * Kinde Auth Wordpress Authenticate class.
@@ -28,7 +28,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $token_host;
 
@@ -37,7 +37,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $client_id;
 
@@ -46,7 +46,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $client_secret;
 
@@ -55,7 +55,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $grant_type;
 
@@ -64,7 +64,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     object
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	private $kinde_client;
 
@@ -73,7 +73,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     object
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	private $kinde_config;
 
@@ -82,7 +82,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     string
 	 * @access  private
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
     private  $kinde_error_url = '/kinde-authenticate/error';
 
@@ -91,7 +91,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     string
 	 * @access  private
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
     private  $wordpress_frontend_url = '/index.php';
 
@@ -100,7 +100,7 @@ class Kinde_Auth_Wordpress_Authenticate
 	 *
 	 * @var     string
 	 * @access  private
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
     private  $wordpress_admin_url = '/wp-admin/index.php';
 
@@ -110,20 +110,20 @@ class Kinde_Auth_Wordpress_Authenticate
 	 */
 	public function __construct()
 	{
-        $this->token_host = get_option('kinde_auth_token_host');
-        $this->client_id = get_option('kinde_auth_client_id');
-        $this->client_secret = get_option('kinde_auth_client_secret');
-        $this->grant_type = get_option('kinde_auth_grant_type') ?? GrantType::authorizationCode;
+        $this->token_host = esc_attr(get_option('kinde_auth_token_host', ''));
+        $this->client_id = esc_attr(get_option('kinde_auth_client_id', ''));
+        $this->client_secret = esc_attr(get_option('kinde_auth_client_secret', ''));
+        $this->grant_type = esc_attr(get_option('kinde_auth_grant_type', GrantType::authorizationCode));
 
         // register login,register,logout action
-        add_action('init',  array($this, 'show_new_wordpress_login_form'));
-        add_action('init',  array($this, 'handle_login_wordpress_site'));
-        add_action('init',  array($this, 'create_login_action'));
-        add_action('init',  array($this, 'create_register_action'));
-        add_action('init',  array($this, 'create_logout_action'));
-        add_action('init',  array($this, 'create_response_action'));
-        add_action('init',  array($this, 'create_error_action'));
-        add_action('init',  array($this, 'handle_logout_wordpress_site'));
+        add_action('init', array($this, 'show_new_wordpress_login_form'));
+        add_action('init', array($this, 'handle_login_wordpress_site'));
+        add_action('init', array($this, 'create_login_action'));
+        add_action('init', array($this, 'create_register_action'));
+        add_action('init', array($this, 'create_logout_action'));
+        add_action('init', array($this, 'create_response_action'));
+        add_action('init', array($this, 'create_error_action'));
+        add_action('init', array($this, 'handle_logout_wordpress_site'));
 	}
 
     /**
@@ -147,19 +147,13 @@ class Kinde_Auth_Wordpress_Authenticate
 	 */
 	public function handle_login_wordpress_site()
 	{
-        // kinde login page redirect type
-        $redirect_page = get_option('kinde_auth_redirect_page') ?? 'wordpress';
-        if ($redirect_page == 'wordpress') {
-            return;
-        }
-
-        // not action if user login by wordpress method
-        if (!empty($_POST['normal_login']) && $_POST['normal_login'] == 'normal-login') {
-            return;
-        }
-
-        // user is logged
-        if (is_user_logged_in()) {
+        // not action if default login page is wordpress or use default wordpress login url or logged
+        $default_login_page = esc_attr(get_option('kinde_auth_default_login_page') ?? 'wordpress');
+        $normal_login = sanitize_text_field($_POST['normal_login'] ?? '') ;
+        if ($default_login_page == 'wordpress' ||
+            (!empty($normal_login) && $normal_login == 'normal-login') ||
+            is_user_logged_in()
+        ) {
             return;
         }
 
@@ -264,22 +258,27 @@ class Kinde_Auth_Wordpress_Authenticate
             return;
         }
 
-        if (empty($_GET['code'])) {
+        $access_token = sanitize_text_field($_GET['code'] ?? '');
+
+        if (empty($access_token)) {
             exit(header("Location: $this->kinde_error_url?message=Something went wrong"));
         }
-
-        $access_token = $_GET['code'];
 
         if (in_array($this->grant_type, [GrantType::authorizationCode, GrantType::PKCE])) {
             $this->connection_with_kinde();
             $error_message = "";
             try {
+                if ($this->kinde_client->getAuthStatus() == AuthStatus::UNAUTHENTICATED) {
+                    $error_message = AuthStatus::UNAUTHENTICATED;
+                    exit(header("Location: $this->kinde_error_url?message=".urlencode($error_message)));
+                }
+
                 $response = $this->kinde_client->getToken();
                 $access_token = $response->access_token;
                 $this->kinde_config = new Configuration();
                 $this->kinde_config->setHost($this->token_host);
-                $user_api_instance = new UserApi($this->kinde_config);
-                $user = $user_api_instance->getUserProfile();
+                $oauth_api_instance = new OAuthApi($this->kinde_config);
+                $user = $oauth_api_instance->getUser();
 
                 // get wordpress user
                 $wordpress_user = $this->get_current_wordpress_user($user);
@@ -290,10 +289,11 @@ class Kinde_Auth_Wordpress_Authenticate
                 wp_set_auth_cookie($wordpress_user['user_id']);
                 do_action('wp_login', $wordpress_user['user_login'], $current_user);
 
-                if (in_array($wordpress_user['user_role'], ['subscriber', 'contributor'])) {
+                if (empty($wordpress_user['user_role']) ||
+                    in_array($wordpress_user['user_role'], ['subscriber', 'contributor'])
+                ) {
                     exit(header("Location:  $this->wordpress_frontend_url"));
                 }
-
                 exit(header("Location: $this->wordpress_admin_url"));
 
             } catch (ClientException | RequestException $e) {
@@ -307,7 +307,7 @@ class Kinde_Auth_Wordpress_Authenticate
             }
         }
 
-        include WP_KINDE_AUTH_AUTHENTICATE_DIR.'../../templates/response-page.php';
+        include_once(KINDE_AUTH__PLUGIN_DIR.'templates/response-page.php');
     }
 
     /**
@@ -321,7 +321,7 @@ class Kinde_Auth_Wordpress_Authenticate
             return;
         }
 
-        include WP_KINDE_AUTH_AUTHENTICATE_DIR.'../../templates/error-page.php';
+        include_once(KINDE_AUTH__PLUGIN_DIR.'templates/error-page.php');
     }
 
     /**
@@ -342,7 +342,7 @@ class Kinde_Auth_Wordpress_Authenticate
         // logout user
         wp_destroy_current_session();
         wp_clear_auth_cookie();
-        wp_set_current_user( 0 );
+        wp_set_current_user(0);
 
         // if user not is kinde user -> user create by wordpress admin
         if (empty($user_type) || (!empty($user_type) && $user_type[0] != "kinde")) {
@@ -393,18 +393,22 @@ class Kinde_Auth_Wordpress_Authenticate
      *
      * @return mixed
      */
-    private function connection_with_kinde() {
+    private function connection_with_kinde()
+    {
         if (empty($this->kinde_client)) {
             $error_message = "";
             try {
-                $protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === 0 ? 'https' : 'http';
-                $domain_link = $protocol . '://' . $_SERVER['HTTP_HOST'];
+                $protocol = esc_attr(get_option('kinde_auth_site_protocol', 'http'));
+                $domain_name = sanitize_text_field($_SERVER['HTTP_HOST']) ?? '';
+                $domain_link = "$protocol://$domain_name";
+
                 $this->kinde_client = new KindeClientSDK(
                     $this->token_host,
                     "$domain_link/kinde-authenticate/response",
                     $this->client_id,
                     $this->client_secret,
-                    $this->grant_type
+                    $this->grant_type,
+                    "$domain_link/kinde-authenticate/logout"
                 );
             } catch (ClientException | RequestException $e) {
                 $error_message = $e->getMessage();
@@ -429,9 +433,10 @@ class Kinde_Auth_Wordpress_Authenticate
         $current_user = get_user_by('email', $kinde_user['preferred_email']);
         $user_id = '';
         $user_login = '';
+
         if (empty($current_user)) {
             $user_login = "kinde_user_".generate_random_string();
-            $user_role = get_option('kinde_auth_auto_user_role') ?? 'administrator';
+            $user_role = esc_attr(get_option('kinde_auth_auto_user_role', 'subscriber'));
             $user_data = array(
                 'user_login' => $user_login,
                 'user_email' => $kinde_user['preferred_email'],
@@ -441,13 +446,13 @@ class Kinde_Auth_Wordpress_Authenticate
                 'role' => $user_role,
                 'meta_input' => ['user_type' => 'kinde']
             );
-            $user_id = wp_insert_user($user_data );
+            $user_id = wp_insert_user($user_data);
         } else {
-            $user_type = get_user_meta($current_user->id, 'user_type') ?? '';
+            $user_type = get_user_meta($current_user->ID, 'user_type') ?? '';
             if (empty($user_type)) {
-                add_user_meta($current_user->id, 'user_type', 'kinde');
+                add_user_meta($current_user->ID, 'user_type', 'kinde');
             }
-            $user_id = $current_user->id;
+            $user_id = $current_user->ID;
             $user_login = $current_user->user_login;
             $user_role = $current_user->roles[0];
         }

@@ -20,7 +20,7 @@ class Kinde_Auth_Wordpress_Menu_Page
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $page_title;
 
@@ -29,7 +29,7 @@ class Kinde_Auth_Wordpress_Menu_Page
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $menu_title;
 
@@ -38,7 +38,7 @@ class Kinde_Auth_Wordpress_Menu_Page
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $capability;
 
@@ -47,7 +47,7 @@ class Kinde_Auth_Wordpress_Menu_Page
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $menu_slug;
 
@@ -56,7 +56,7 @@ class Kinde_Auth_Wordpress_Menu_Page
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $callback;
 
@@ -65,16 +65,16 @@ class Kinde_Auth_Wordpress_Menu_Page
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $icon_url;
 
 	/**
 	 * The position.
 	 *
-	 * @var     any
+	 * @var     mixed
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $position;
 
@@ -85,11 +85,11 @@ class Kinde_Auth_Wordpress_Menu_Page
 	 * @param string $menu_title Menu Page menu title.
 	 * @param string $capability Menu Page capability.
 	 * @param string $icon_url Menu Page url of icon.
-	 * @param any  $position Menu Page position.
+	 * @param mixed  $position Menu Page position.
 	 */
 	public function __construct($page_title = '', $menu_title = '', $capability = '', $menu_slug = '', $callback = '',  $icon_url = '', $position = null)
     {
-		if ( ! $page_title || ! $menu_title || ! $capability  || ! $menu_slug) {
+		if (! $page_title || ! $menu_title || ! $capability  || ! $menu_slug) {
 			return;
 		}
 

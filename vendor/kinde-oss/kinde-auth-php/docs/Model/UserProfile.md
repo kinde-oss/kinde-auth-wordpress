@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [optional]
 **preferred_email** | **string** |  | [optional]
+**provided_id** | **string** |  | [optional]
 **last_name** | **string** |  | [optional]
 **first_name** | **string** |  | [optional]
 

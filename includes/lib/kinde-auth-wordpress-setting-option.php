@@ -5,7 +5,7 @@
  * @package Kind Auth Wordpress/Includes
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH')) {
 	exit;
 }
 
@@ -19,7 +19,7 @@ class Kinde_Auth_Wordpress_Setting_Option
 	 *
 	 * @var     boolean
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	private $updated;
 
@@ -42,9 +42,10 @@ class Kinde_Auth_Wordpress_Setting_Option
 		register_setting('kinde-auth', 'kinde_auth_token_host', array($this, 'validate_setting_option_token_host'));
 		register_setting('kinde-auth', 'kinde_auth_client_id', array($this, 'validate_setting_option_client_id'));
 		register_setting('kinde-auth', 'kinde_auth_client_secret', array($this, 'validate_setting_option_client_secret'));
-		register_setting('kinde-auth', 'kinde_auth_redirect_page');
+		register_setting('kinde-auth', 'kinde_auth_default_login_page');
 		register_setting('kinde-auth', 'kinde_auth_auto_user_role');
 		register_setting('kinde-auth', 'kinde_auth_grant_type', array($this, 'custom_show_message_success'));
+		register_setting('kinde-auth', 'kinde_auth_site_protocol');
     }
 
 	/**
@@ -84,10 +85,10 @@ class Kinde_Auth_Wordpress_Setting_Option
 	 */
 	public function validate_setting_option($value, $field, $name)
 	{
-		if ( empty( $value ) ) {
+		if (empty($value)) {
 			$this->updated = false;
 			$value = get_option($field);
-			add_settings_error( 'kinde_auth_notice', "invalid_$field", "$name is required." );
+			add_settings_error('kinde_auth_notice', "invalid_$field", "$name is required.");
 		}
 
 		return $value;
@@ -101,7 +102,7 @@ class Kinde_Auth_Wordpress_Setting_Option
 	public function custom_show_message_success($value)
 	{
 		if ($this->updated) {
-			add_settings_error( 'kinde_auth_notice', "", "Settings saved.", "success" );
+			add_settings_error('kinde_auth_notice', "", "Settings saved.", "success");
 		}
 		return $value;
 	}

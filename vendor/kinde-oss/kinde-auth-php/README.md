@@ -46,8 +46,8 @@ Or add the following to your composer.json file:
 1. In Kinde, go to **Settings** > **App keys**.
 2. Add your callback URLs in the relevant fields. For example:
 
-    - Allowed callback URLs - for example, `https://localhost:6789/home/callback`
-    - Allowed logout redirect URLs - for example, `https://localhost:6789`
+    - Allowed callback URLs - for example, `https://localhost:8000/callback`
+    - Allowed logout redirect URLs - for example, `https://localhost:8000`
 
 3. Select **Save**.
 
@@ -62,10 +62,10 @@ Kinde comes with a production environment, but you can set up other environments
 The following variables need to be replaced in the code snippets below.
 
 -   `KINDE_HOST` - your Kinde domain - e.g. `https://your_kinde_domain.kinde.com`
--   `KINDE_REDIRECT_URL` - your callback url, make sure this URL is under your allowed callback redirect URLs. - e.g. `http://localhost:3000/callback`
+-   `KINDE_REDIRECT_URL` - your callback url, make sure this URL is under your allowed callback redirect URLs. - e.g. `http://localhost:8000/callback`
+-   `KINDE_POST_LOGOUT_REDIRECT_URL` - where you want users to be redirected to after logging out, make sure this URL is under your allowed logout redirect URLs. - e.g. `http://localhost:8000`
 -   `KINDE_CLIENT_ID` - you can find this on the **App keys** page - e.g. `your_kinde_client_id`
 -   `KINDE_CLIENT_SECRET` - you can find this on the **App keys** page - e.g. `your_kinde_client_secret`
--   `KINDE_GRANT_TYPE` - the authorisation method - options: `client_credentials`, `authorization_code`, `PKCE`
 
 ## Integrate with your app
 
@@ -96,7 +96,7 @@ private $kindeConfig;
 
 public function __construct()
 {
-    $this->kindeClient = new KindeClientSDK('KINDE_HOST', 'KINDE_REDIRECT_URL', 'KINDE_CLIENT_ID', 'KINDE_CLIENT_SECRET', 'KINDE_GRANT_TYPE');
+    $this->kindeClient = new KindeClientSDK('KINDE_HOST', 'KINDE_REDIRECT_URL', 'KINDE_CLIENT_ID', 'KINDE_CLIENT_SECRET', 'KINDE_GRANT_TYPE', 'KINDE_POST_LOGOUT_REDIRECT_URL');
     $this->kindeConfig = new Configuration();
     $this->kindeConfig->setHost(' KINDE_HOST');
 }
@@ -142,6 +142,23 @@ public function callback()
 }
 ```
 
+You can also get the current authentication status with `AuthStatus`:
+```php
+...
+use Kinde\KindeSDK\Sdk\Enums\AuthStatus;
+...
+
+public function callback()
+{
+    if ($this->kindeClient->getAuthStatus() != AuthStatus::UNAUTHENTICATED) {
+        $token = $this->kindeClient->getToken();
+        $this->kindeConfig->setAccessToken($token->access_token);
+        print_r($token);
+    }
+}
+```
+For more information, please check out `Kinde\KindeSDK\Sdk\Enums\AuthStatus`
+
 ## Logout
 
 The Kinde SPA client comes with a logout method.
@@ -154,28 +171,29 @@ $this->kindeClient->logout();
 
 You need to have already authenticated before you call the API, otherwise an error will occur.
 
-Use the `Kinde\KindeSDK\Api\UserApi` class, then call the getUserProfile method.
+Use the `Kinde\KindeSDK\Api\OAuthApi` class, then call the `getUser` method.
 
 ```php
 ...
 
-use Kinde\KindeSDK\Api\UserApi;
+use Kinde\KindeSDK\Api\OAuthApi;
 
 ...
 
 public function getProfile()
 {
 
-    $apiInstance = new UserApi($this->kindeConfig); // You have already defined `$this->kindeConfig` in the construction function
+    $apiInstance = new OAuthApi($this->kindeConfig); // You have already defined `$this->kindeConfig` in the construction function
 
     try {
-        $result = $apiInstance->getUserProfile();
+        $result = $apiInstance->getUser();
         print_r($result);
     } catch (Exception $e) {
-        echo 'Exception when calling UserApi->getUserProfile: ', $e->getMessage(), PHP_EOL;
+        echo 'Exception when calling UserApi->getUser: ', $e->getMessage(), PHP_EOL;
     }
 }
 ```
+
 
 ### View users in Kinde
 
@@ -197,5 +215,171 @@ After a user signs in and they are verified, the token return includes permissio
     "delete:tasks",
 ];
 ```
+We provide helper functions to more easily access permissions:
+
+```php
+$this->kindeClient->getPermission('create:todos');
+// ['orgCode' => 'org_1234', 'isGranted' => true]
+
+$this->kindeClient->getPermissions();
+// ['orgCode' => 'org_1234', 'permissions' => ['create:todos', 'update:todos', 'read:todos']]
+```
+
+A practical example in code might look something like:
+
+```php
+if ($this->kindeClient->getPermission("create:todos")['isGranted']) {
+    // create new a todo
+}
+```
+### Audience
+
+An `audience` is the intended recipient of an access token - for example the API for your application. The audience argument can be passed to the Kinde client to request an audience be added to the provided token.
+
+The audience of a token is the intended recipient of the token.
+
+```php
+...
+public function __construct()
+{
+   $this->kindeClient = new KindeClientSDK('KINDE_HOST', 'KINDE_REDIRECT_URL', 'KINDE_CLIENT_ID', 'KINDE_CLIENT_SECRET', 'KINDE_GRANT_TYPE', 'KINDE_POST_LOGOUT_REDIRECT_URL', 'YOUR_SCOPES', [
+      'audience' => 'api.yourapp.com'
+   ]);
+   ...
+}
+```
+
+For details on how to connect, see [Register an API](https://kinde.com/docs/developer-tools/register-an-api/)
+
+### Overriding scope
+
+By default the KindeSDK SDK requests the following scopes:
+
+-   profile
+-   email
+-   offline
+-   openid
+
+You can override this by passing scope into the KindeSDK
+
+```php
+...
+public function __construct()
+{
+   $this->kindeClient = new KindeClientSDK('KINDE_HOST', 'KINDE_REDIRECT_URL', 'KINDE_CLIENT_ID', 'KINDE_CLIENT_SECRET', 'KINDE_GRANT_TYPE', 'KINDE_POST_LOGOUT_REDIRECT_URL', 'profile email offline openid');
+   ...
+}
+```
+
+### Getting claims
+
+We have provided a helper to grab any claim from your id or access tokens. The helper defaults to access tokens:
+
+```php
+$this->kindeClient->getClaim('aud');
+// ['api.yourapp.com']
+
+$this->kindeClient->getClaim('given_name', 'id_token');
+// 'David'
+```
+
+### Organizations Control
+
+#### Create an organization
+
+To have a new organization created within your application, you will need to run a similar function to below:
+
+```php
+public function register()
+{
+    $this->kindeClient->createOrg();
+}
+```
+
+You can also pass org_name as your organization
+```php
+    ...
+    $this->kindeClient->createOrg(['org_name' => 'Your Organization']);
+    ...
+```
+
+#### Sign up and sign in to organizations
+
+Kinde has a unique code for every organization. You’ll have to pass this code through when you register a new user. Example function below:
+
+```php
+    $this->kindeClient->register(['org_code' => 'your_org_code']);
+```
+
+If you want a user to sign into a particular organization, pass this code along with the sign in method.
+
+```php
+    $this->kindeClient->login(['org_code' => 'your_org_code']);
+```
+
+Following authentication, Kinde provides a json web token (jwt) to your application. Along with the standard information we also include the org_code and the permissions for that organization (this is important as a user can belong to multiple organizations and have different permissions for each). Example of a returned token:
+
+```json
+{
+    "aud": [],
+    "exp": 1658475930,
+    "iat": 1658472329,
+    "iss": "https://your_subdomain.kinde.com",
+    "jti": "123457890",
+    "org_code": "org_1234",
+    "permissions": ["read:todos", "create:todos"],
+    "scp": ["openid", "profile", "email", "offline"],
+    "sub": "kp:123457890"
+}
+```
+
+The id_token will also contain an array of organization that a user belongs to - this is useful if you want to build out an organization switcher for example.
+
+```json
+{
+...
+"org_codes": ["org_1234", "org_4567"]
+...
+}
+```
+
+There are two helper functions you can use to extract information:
+
+```php
+$this->kindeClient->getOrganization();
+// ['orgCode' => 'org_1234']
+
+$this->kindeClient->getUserOrganizations();
+// ['orgCodes' => ['org_1234', 'org_abcd']]
+```
+
+## SDK API Reference
+
+| Property                        | Type   | Is required | Default                      | Description                                                                         |
+| ------------------------------- | ------ | ----------- | ---------------------------- | ----------------------------------------------------------------------------------- |
+| host                            | string | Yes         |                              | Either your Kinde instance url or your custom domain. e.g https://yourapp.kinde.com |
+| redirectUri                     | string | Yes         |                              | The url that the user will be returned to after authentication                      |
+| clientId                        | string | Yes         |                              | The id of your application - get this from the Kinde admin area                     |
+| clientSecret                    | string | Yes         |                              | The id secret of your application - get this from the Kinde admin area              |
+| logoutRedirectUri               | string | Yes         |                              | Where your user will be redirected upon logout                                      |
+| scope                           | string | No          | openid profile email offline | The scopes to be requested from Kinde                                               |
+| additionalParameters            | array  | No          | \[\]                         | Additional parameters that will be passed in the authorization request              |
+| additionalParameters - audience | string | No          |                              | The audience claim for the JWT                                                      |
+
+## KindeSDK methods
+
+| Property             | Description                                                                                       | Arguments                        | Usage                                                                                  | Sample output                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| login                | Constructs redirect url and sends user to Kinde to sign in                                        | org\_code?: string               | $kinde->login();                                                                       |                                                                                                       |
+| register             | Constructs redirect url and sends user to Kinde to sign up                                        | org\_code?: string               | $kinde->register();                                                                    |                                                                                                       |
+| logout               | Logs the user out of Kinde                                                                        |                                  | $kinde->logout();                                                                      |                                                                                                       |
+| getToken             | Returns the raw access token from URL after logged from Kinde                                     |                                  | $kinde->getToken();                                                                    | eyJhbGciOiJIUzI1...                                                                                   |
+| createOrg            | Constructs redirect url and sends user to Kinde to sign up and create a new org for your business | org\_name?: string               | $kinde->createOrg(); or $kinde->createOrg(\['org\_name' => 'your organization name'}); | redirect                                                                                              |
+| getClaim             | Gets a claim from an access or id token                                                           | claim: string, tokenKey?: string | $kinde->getClaim('given\_name', 'id\_token');                                          | David'                                                                                                |
+| getPermission        | Returns the state of a given permission                                                           | key: string                      | $kinde->getPermission('read:todos');                                                   | \['orgCode' => 'org\_1234', 'isGranted' => true\]                                                     |
+| getPermissions       | Returns all permissions for the current user for the organization they are logged into            |                                  | $kinde->getPermissions();                                                              | \['orgCode' => 'org\_1234', permissions => \['create:todos', 'update:todos', 'read:todos'\]\]         |
+| getOrganization      | Get details for the organization your user is logged into                                         |                                  | $kinde->getOrganization();                                                             | \['orgCode' => 'org\_1234'\]                                                                          |
+| getUserDetails       | Returns the profile for the current user                                                          |                                  | $kinde->getUserDetails();                                                              | \['given\_name' => 'Dave', 'id' => 'abcdef', 'family\_name' => 'Smith', 'email' => 'dave@smith.com'\] |
+| getUserOrganizations | Gets an array of all organizations the user has access to                                         |                                  |                                                                                        |                                                                                                       |
 
 If you need help connecting to Kinde, please contact us at [support@kinde.com](mailto:support@kinde.com).

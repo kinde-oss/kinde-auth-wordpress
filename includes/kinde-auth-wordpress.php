@@ -20,25 +20,16 @@ class Kinde_Auth_Wordpress
 	 *
 	 * @var     object
 	 * @access  private
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	private static $instance = null; //phpcs:ignore
-
-	/**
-	 * Settings class object
-	 *
-	 * @var     object
-	 * @access  public
-	 * @since   0.0.1
-	 */
-	public $settings = null;
 
 	/**
 	 * The version number.
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $version; //phpcs:ignore
 
@@ -47,7 +38,7 @@ class Kinde_Auth_Wordpress
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $token; //phpcs:ignore
 
@@ -56,36 +47,9 @@ class Kinde_Auth_Wordpress
 	 *
 	 * @var     string
 	 * @access  public
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public $file;
-
-	/**
-	 * The main plugin directory.
-	 *
-	 * @var     string
-	 * @access  public
-	 * @since   0.0.1
-	 */
-	public $dir;
-
-	/**
-	 * The plugin assets directory.
-	 *
-	 * @var     string
-	 * @access  public
-	 * @since   1.0.0
-	 */
-	public $assetsDir;
-
-	/**
-	 * The plugin assets URL.
-	 *
-	 * @var     string
-	 * @access  public
-	 * @since   0.0.1
-	 */
-	public $assetsUrl;
 
 	/**
 	 * Constructor function.
@@ -93,20 +57,16 @@ class Kinde_Auth_Wordpress
 	 * @param string $file File constructor.
 	 * @param string $version Plugin version.
 	 */
-	public function __construct($file = '', $version = '0.0.1')
+	public function __construct($file = '', $version = KINDE_AUTH_VERSION)
 	{
 		$this->version = $version;
-		$this->token   = 'kinde-auth-wordpress';
+		$this->token = 'kinde-auth';
 
 		// Load plugin environment variables.
-		$this->file       = $file;
-		$this->dir        = dirname($this->file);
-		$this->assetsDir = trailingslashit($this->dir) . 'assets';
-		$this->assetsUrl = esc_url(trailingslashit(plugins_url('/assets/', $this->file)));
+		$this->file = $file;
 
 		// Register hook plugin install
 		register_activation_hook($this->file, array($this, 'install'));
-
 
 		if (is_admin()) {
 			// Register a menu
@@ -114,9 +74,9 @@ class Kinde_Auth_Wordpress
 				'Kinde Auth Setting',
 				'Kinde Auth',
 				'manage_options',
-				'kinde-auth',
+				$this->token,
 				array($this, 'register_template_admin'),
-				plugins_url("kinde-auth-wordpress/assets/img/logo.png"),
+				KINDE_AUTH__PLUGIN_URL."assets/img/logo.png",
 				6
 			);
 
@@ -140,12 +100,13 @@ class Kinde_Auth_Wordpress
 	/**
 	 * Register a custom menu kinde auth
 	 *
-	 * @param string $page_title Post Type.
-	 * @param string $menu_title Plural Label.
-	 * @param string $capability Single Label.
-	 * @param string $menu_slug Description.
-	 * @param string $callback Description.
-	 * @param string $position Description.
+	 * @param string $page_title Page Title.
+	 * @param string $menu_title Menu Title.
+	 * @param string $capability Capability.
+	 * @param string $menu_slug Menu Slug.
+	 * @param mixed $callback Callback.
+	 * @param string $icon_url Icon URL.
+	 * @param string $position Position.
 	 *
 	 * @return bool|Kinde_Auth_Wordpress_Menu_Page
 	 */
@@ -234,12 +195,12 @@ class Kinde_Auth_Wordpress
 	 * @param string $file File instance.
 	 * @param string $version Version parameter.
 	 *
-	 * @return Object Kinde_Auth_Wordpress instance
+	 * @return object Kinde_Auth_Wordpress instance
 	 * @see Kinde_Auth_Wordpress()
-	 * @since 0.0.1
+	 * @since 1.0
 	 * @static
 	 */
-	public static function instance($file = '', $version = '0.0.1')
+	public static function instance($file = '', $version = '1.0')
 	{
 		if (is_null(self::$instance)) {
 			self::$instance = new self($file, $version);
@@ -251,7 +212,7 @@ class Kinde_Auth_Wordpress
 	/**
 	 * Cloning is forbidden.
 	 *
-	 * @since 0.0.1
+	 * @since 1.0
 	 */
 	public function __clone() {
 		_doing_it_wrong( __FUNCTION__, esc_html( __( 'Cloning of WordPress_Plugin_Template is forbidden' ) ), esc_attr( $this->_version ) );
@@ -261,7 +222,7 @@ class Kinde_Auth_Wordpress
 	/**
 	 * Unserializing instances of this class is forbidden.
 	 *
-	 * @since 0.0.1
+	 * @since 1.0
 	 */
 	public function __wakeup() {
 		_doing_it_wrong( __FUNCTION__, esc_html( __( 'Unserializing instances of WordPress_Plugin_Template is forbidden' ) ), esc_attr( $this->_version ) );
@@ -272,7 +233,7 @@ class Kinde_Auth_Wordpress
 	 *
 	 * @access  public
 	 * @return  void
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	public function install() {
 		$this->_log_version_number();
@@ -283,7 +244,7 @@ class Kinde_Auth_Wordpress
 	 *
 	 * @access  public
 	 * @return  void
-	 * @since   0.0.1
+	 * @since   1.0
 	 */
 	private function _log_version_number() {
 		update_option( $this->token . '_version', $this->version );

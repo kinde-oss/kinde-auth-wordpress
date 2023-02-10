@@ -9,8 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WP_KINDE_AUTH_PLUGIN_DIR', plugin_dir_path( __FILE__ ) ); // Includes trailing slash
-
 /**
  * Admin Template class.
  */
@@ -31,6 +29,6 @@ class Kinde_Auth_Wordpress_Template_Admin
      */
     private function render_setting_page_html()
     {
-        include WP_KINDE_AUTH_PLUGIN_DIR.'../../templates/setting-page.php';
+        include_once(KINDE_AUTH__PLUGIN_DIR.'templates/setting-page.php');
     }
 }
