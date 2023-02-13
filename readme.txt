@@ -9,7 +9,7 @@ Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Easily Kinde Authorization on WordPress site through Kinde Auth.
+Easily add Kinde Authorization on your WordPress site
 
 == Description ==
 
@@ -25,7 +25,7 @@ Kinde supports all of the most popular languages including JavaScript (React, Re
 
 == Frequently Asked Questions ==
 
-= How to config plugin? =
+= How to configure this plugin? =
 1. Go to the plugin setting page at `YOUR_WORDPRESS_URL/wp-admin/admin.php?page=kinde-auth`
 2. Enter value for `Token host`, `Client ID`, `Client Secret`, `Grant Type`, `Auto Create User as Role`, `Default Login Page`, `Your Site Protocol`
 3. For the Grant Type, choose one of the two methods `Authorization Code`, `Authorization Code with PKCE`
