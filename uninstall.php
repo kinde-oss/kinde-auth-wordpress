@@ -14,3 +14,8 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // Do something here if plugin is being uninstalled.
+foreach ( wp_load_alloptions() as $option => $value ) {
+    if ( strpos( $option, 'kinde_auth_' ) === 0 ) {
+        delete_option( $option );
+    }
+}

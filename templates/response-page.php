@@ -17,11 +17,11 @@
                 <h1 class="response-content-title">Kinde Authenticate Response</h1>
                 <div class="response-content-detail">
                    <p>
-                        <span>Your Access Token: <?php echo substr($accessToken, 0, 30) ?>...</span>
+                        <span>Your Access Token: <?php echo esc_html(substr($accessToken, 0, 30)) ?>...</span>
                     </p>
                     <?php if ($user) { ?>
-                        <p>Your Email: <?php echo $user['preferred_email'] ?></p>
-                        <p>Your Name: <?php echo $user['first_name']." ".$user['last_name'] ?></p>
+                        <p>Your Email: <?php echo esc_html($user['preferred_email']) ?></p>
+                        <p>Your Name: <?php echo esc_html($user['first_name']." ".$user['last_name']) ?></p>
                     <?php } else { ?>
                         <p>Your Profile: Not yet provider for this authenticate</p>
                     <?php } ?>
@@ -32,7 +32,6 @@
                 </div>
             </div>
         </div>
-        <iframe src="https://testingpro.kinde.com/auth/cx/_:nav&m:login&lid:5eda9257-16a4-401a-a65f-5a9d684d6d0b"></iframe>
     </div>
 </body>
 </html>

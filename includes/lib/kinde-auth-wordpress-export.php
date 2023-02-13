@@ -20,7 +20,6 @@ class Kinde_Auth_Wordpress_Export
 	 */
 	public function __construct()
 	{
-
         // register export action
         add_action('init',  array($this, 'handle_export_wordpress_user_to_csv'));
 	}

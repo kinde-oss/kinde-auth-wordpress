@@ -38,12 +38,12 @@
             'dev_requirement' => false,
         ),
         'kinde-oss/kinde-auth-php' => array(
-            'pretty_version' => '0.0.1',
-            'version' => '0.0.1.0',
+            'pretty_version' => '0.0.2',
+            'version' => '0.0.2.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../kinde-oss/kinde-auth-php',
             'aliases' => array(),
-            'reference' => 'dc850703334460cbdc5bb8e3d641cb48e69ad235',
+            'reference' => 'd9b2d63bd172901e4cd2ad21ca6b83c5291e98c0',
             'dev_requirement' => false,
         ),
         'kinde/auth-wordpress-plugin' => array(

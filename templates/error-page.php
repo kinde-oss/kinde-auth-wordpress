@@ -14,9 +14,10 @@
                 <h1 class="error-content-title">Kinde Authenticate Error</h1>
                 <div class="error-content-detail">
                     <?php
-                        if (!empty($_GET['message'])) {
+                        $message_field = sanitize_text_field($_GET['message'] ?? '');
+                        if (!empty($message_field)) {
                     ?>
-                        <p><?php echo urldecode($_GET['message']) ?></p>
+                        <p><?php echo esc_html(urldecode($message_field)) ?></p>
                     <?php
                         }
                     ?>
