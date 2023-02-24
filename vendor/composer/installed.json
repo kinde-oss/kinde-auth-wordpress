@@ -342,17 +342,17 @@
         },
         {
             "name": "kinde-oss/kinde-auth-php",
-            "version": "0.0.2",
-            "version_normalized": "0.0.2.0",
+            "version": "0.0.3",
+            "version_normalized": "0.0.3.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/kinde-oss/kinde-sdk-php.git",
-                "reference": "d9b2d63bd172901e4cd2ad21ca6b83c5291e98c0"
+                "url": "https://github.com/kinde-oss/kinde-php-sdk.git",
+                "reference": "30ad95ca9aed1987289675b3d51d0c1695f11307"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kinde-oss/kinde-sdk-php/zipball/d9b2d63bd172901e4cd2ad21ca6b83c5291e98c0",
-                "reference": "d9b2d63bd172901e4cd2ad21ca6b83c5291e98c0",
+                "url": "https://api.github.com/repos/kinde-oss/kinde-php-sdk/zipball/30ad95ca9aed1987289675b3d51d0c1695f11307",
+                "reference": "30ad95ca9aed1987289675b3d51d0c1695f11307",
                 "shasum": ""
             },
             "require": {
@@ -367,7 +367,7 @@
                 "friendsofphp/php-cs-fixer": "^3.5",
                 "phpunit/phpunit": "^8.0 || ^9.0"
             },
-            "time": "2023-01-13T04:40:31+00:00",
+            "time": "2023-02-23T07:05:20+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -395,8 +395,8 @@
                 "sdk"
             ],
             "support": {
-                "issues": "https://github.com/kinde-oss/kinde-sdk-php/issues",
-                "source": "https://github.com/kinde-oss/kinde-sdk-php/tree/v0.0.2"
+                "issues": "https://github.com/kinde-oss/kinde-php-sdk/issues",
+                "source": "https://github.com/kinde-oss/kinde-php-sdk/tree/v0.0.3"
             },
             "install-path": "../kinde-oss/kinde-auth-php"
         },

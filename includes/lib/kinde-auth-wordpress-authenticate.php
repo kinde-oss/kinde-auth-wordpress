@@ -104,7 +104,6 @@ class Kinde_Auth_Wordpress_Authenticate
 	 */
     private  $wordpress_admin_url = '/wp-admin/index.php';
 
-
 	/**
 	 * Constructor function
 	 */
@@ -401,6 +400,7 @@ class Kinde_Auth_Wordpress_Authenticate
                 $protocol = esc_attr(get_option('kinde_auth_site_protocol', 'http'));
                 $domain_name = sanitize_text_field($_SERVER['HTTP_HOST']) ?? '';
                 $domain_link = "$protocol://$domain_name";
+                $scopes = 'openid profile email offline';
 
                 $this->kinde_client = new KindeClientSDK(
                     $this->token_host,
@@ -408,7 +408,10 @@ class Kinde_Auth_Wordpress_Authenticate
                     $this->client_id,
                     $this->client_secret,
                     $this->grant_type,
-                    "$domain_link/kinde-authenticate/logout"
+                    "$domain_link/kinde-authenticate/logout",
+                    $scopes,
+                    [],
+                    $protocol
                 );
             } catch (ClientException | RequestException $e) {
                 $error_message = $e->getMessage();
