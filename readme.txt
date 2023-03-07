@@ -63,6 +63,10 @@ Please visit [our document site at https://kinde.com/docs](https://kinde.com/doc
 = I found a bug in the plugin. =
 Please post it in the [WordPress support forum](https://wordpress.org/support/plugin/kinde-auth/) and we'll fix it right away. Thanks for helping.
 
+= Notes on website using Multiple Instance =
+Check where the session on your website is stored on the server, default stored at the `tmp/sessions`
+Make sure session data sync between each instance by mount, volume or shared folder stored session
+
 == Screenshots ==
 
 1. Configuration options for using the Kinde Auth
