@@ -61,7 +61,7 @@ class Kinde_Auth_Wordpress_Export
                     'salt' => substr($user_data->user_pass, 4, 8),
                     'salt_position' => 'prefix',
                     'hashed_password' => $user_data->user_pass,
-                    'hashing_method' => 'brcypt',
+                    'hashing_method' => 'wordpress',
                     'email_verified' => $user_data->user_status == "0" ? "true" : "false"
                 ];
 
